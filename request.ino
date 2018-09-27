@@ -4,6 +4,7 @@
 #include <ESP8266mDNS.h>
 
 #include "index.h"
+#include "clock.h"
 
 #define LED 2
 
@@ -91,4 +92,8 @@ void setup(void){
 //==============================================================
 void loop(void){
   server.handleClient();          //Handle client requests
+  
+  if(Clock.hasSecondsChanged()) {
+    Clock.toString();
+  }
 }
