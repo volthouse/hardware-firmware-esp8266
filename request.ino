@@ -22,7 +22,9 @@ void handleRoot()
 
 void handleGetDate()
 { 
-  String s = rtc.toString() + " Count: " + String(count);
+  String s = rtc.toString() + " Count: " 
+    + String(count) + " Reboot Count:" 
+    + rtc.getRebootCount();
   server.send(200, "text/plane", s);
 }
 
@@ -101,7 +103,7 @@ void loop(void)
   if(rtc.hasSecondsChanged()) {
     if(count++ > 59) {
         rtc.save();
-        ESP.deepSleep(29 * 1e6, WAKE_RFCAL);
+        ESP.deepSleep(SLEEP_SEC * 1e6, WAKE_RFCAL);
     }
   }
 }

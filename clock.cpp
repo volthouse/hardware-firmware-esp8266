@@ -11,11 +11,6 @@
 
 #define MAGIC_NO 0xABCDEFAB
 
-struct {
-  int magic;
-  int count;
-  timeval tv;
-} rtc_time_desc;
 
 ClockClass::ClockClass(uint32_t sleepTimeMs) 
   : sleepTimeMs(sleepTimeMs)
@@ -86,6 +81,11 @@ void ClockClass::save()
   rtc_time_desc.count++;
   memcpy(&rtc_time_desc.tv, &tv, sizeof(tv));
   ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtc_time_desc, sizeof(rtc_time_desc));  
+}
+
+uint32_t ClockClass::getRebootCount()
+{
+  return  rtc_time_desc.count;
 }
 
 String ClockClass::toString()
