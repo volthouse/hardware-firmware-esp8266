@@ -7,36 +7,39 @@
 #include "clock.h"
 
 #define LED 2
+#define SLEEP_SEC 15
 
+static uint32_t count = 0;
+
+ClockClass rtc(SLEEP_SEC);
 ESP8266WebServer server(80);
 
-void handleRoot() {
+void handleRoot()
+{
  String s = MAIN_page;
  server.send(200, "text/html", s);
 }
 
-void handleGetDate() { 
- server.send(200, "text/plane", "");
+void handleGetDate()
+{ 
+  String s = rtc.toString() + " Count: " + String(count);
+  server.send(200, "text/plane", s);
 }
 
-void handleSetDate() {  
-  String date = server.arg("date");
+void handleSetDate()
+{  
   int year = server.arg("year").toInt();
   int month = server.arg("month").toInt();
   int day = server.arg("day").toInt();
   int hours = server.arg("hours").toInt();
   int minutes = server.arg("minutes").toInt();
   int seconds = server.arg("seconds").toInt();
-  Serial.println(date);
-  Serial.println(year);
-  Serial.println(month);
-  Serial.println(day);
-  Serial.println(hours);
-  Serial.println(minutes);
-  Serial.println(seconds);  
+  
+  rtc.setClock(year, month, day, hours, minutes, seconds);
 }
 
-void handleLED() {
+void handleLED()
+{
  String ledState = "OFF";
  String t_state = server.arg("LEDstate");
  Serial.println(t_state);
@@ -56,7 +59,8 @@ void handleLED() {
 //==============================================================
 //                  SETUP
 //==============================================================
-void setup(void){
+void setup(void)
+{
   Serial.begin(115200);
   
   
@@ -90,10 +94,14 @@ void setup(void){
 //==============================================================
 //                     LOOP
 //==============================================================
-void loop(void){
+void loop(void)
+{   
   server.handleClient();          //Handle client requests
   
-  if(Clock.hasSecondsChanged()) {
-    Clock.toString();
+  if(rtc.hasSecondsChanged()) {
+    if(count++ > 59) {
+        rtc.save();
+        ESP.deepSleep(29 * 1e6, WAKE_RFCAL);
+    }
   }
 }

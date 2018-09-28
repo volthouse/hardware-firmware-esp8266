@@ -9,7 +9,6 @@
 #define TZ_SEC   ((TZ)*3600)
 #define DST_SEC  ((DST_MN)*60)
 
-#define SLEEP_SEC 15
 #define MAGIC_NO 0xABCDEFAB
 
 struct {
@@ -18,7 +17,9 @@ struct {
   timeval tv;
 } rtc_time_desc;
 
-ClockClass::ClockClass() {
+ClockClass::ClockClass(uint32_t sleepTimeMs) 
+  : sleepTimeMs(sleepTimeMs)
+{
   
   ESP.rtcUserMemoryRead(0, (uint32_t*) &rtc_time_desc, sizeof(rtc_time_desc));
   
@@ -30,7 +31,7 @@ ClockClass::ClockClass() {
     timeval tv;
     timeval tv_add;
     memset(&tv_add, 0, sizeof(tv_add));
-    tv_add.tv_sec = SLEEP_SEC;
+    tv_add.tv_sec = sleepTimeMs;
     add(rtc_time_desc.tv, tv_add, tv);
     timezone tz = { TZ_MN + DST_MN, 0 };
     settimeofday(&tv, &tz);
@@ -87,15 +88,10 @@ void ClockClass::save()
   ESP.rtcUserMemoryWrite(0, (uint32_t*) &rtc_time_desc, sizeof(rtc_time_desc));  
 }
 
-void ClockClass::toString()
+String ClockClass::toString()
 {
-  time_t now = time(nullptr);
-  
-  char b[200];
+  time_t now = time(nullptr);  
+  char b[100];
   ctime_r(&now, b);
-  Serial.println(b);
-
-  //return String(b);
+  return String(b);
 }
-
-ClockClass Clock;

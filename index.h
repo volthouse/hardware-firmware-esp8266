@@ -11,7 +11,8 @@ const char MAIN_page[] PROGMEM = R"=====(
 </div>
 
 <div>
-	ESP Date is : <span id="ESPDate">NA</span><br>
+	SYS Date is : <span id="SYSDate">NA</span><br>
+  ESP Date is : <span id="ESPDate">NA</span><br>
   LED State is : <span id="LEDState">NA</span>
 </div>
 <script>
@@ -41,21 +42,21 @@ function setDate() {
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", "setDate", true);
   xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  xhttp.send(s);
-  //xhttp.send();
+  xhttp.send(s); 
 }
 
 setInterval(function() {
   // Call a function repetatively with 2 Second interval
-  //getDate();
+  getDate();
 }, 2000); //2000mSeconds update rate
 
 function getDate() {  
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("ESPDate").innerHTML =
-      this.responseText;
+      var date = new Date();
+      document.getElementById("SYSDate").innerHTML = date.toString();
+      document.getElementById("ESPDate").innerHTML = this.responseText;
     }
   };
   xhttp.open("GET", "getDate", true);
